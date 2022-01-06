@@ -1,0 +1,7 @@
+---
+- include_tasks: firewall.yml
+- include_tasks: install.yml
+- include_tasks: easyrsa_config.yml
+- include_tasks: openvpn_config.yml
+- include_tasks: startup.yml
+

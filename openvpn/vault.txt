@@ -1,0 +1,8 @@
+# the vault contains the following variables:
+easyrsa_ca_passphrase: sometrickypasshrasehere
+
+# obviously these are examples, not the actual keys and passwords encrypted in the vault.
+
+# if you don't have the key to edit the vault, you need to create you own vault to replace vault.yml
+# ansible-vault create vault.yml --vault-password-file=~/crypt/keys/someotherkey.pem
+# ansible-playbook site.yml --vault-password-file ~/crypt/keys/someotherkey.pem -v -e@vault.yml

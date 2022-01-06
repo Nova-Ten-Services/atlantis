@@ -1,0 +1,161 @@
+---
+# This section does these steps using easyrsa:
+# ./easyrsa init-pki
+# ./easyrsa build-ca
+# ./easyrsa gen-dh
+# ./easyrsa gen-req server nopass
+# ./easyrsa sign-req server server
+
+- name: ./easyrsa init-pki
+  command: ./easyrsa init-pki
+  args:
+    chdir: /etc/openvpn/easy-rsa
+    creates: /etc/openvpn/easy-rsa/pki
+
+- name: ./easyrsa build-ca
+  shell: |
+    set timeout 60
+    spawn ./easyrsa build-ca
+
+    expect Passphrase:
+    send {{ easyrsa_ca_passphrase }}\n
+
+    expect Passphrase:
+    send {{ easyrsa_ca_passphrase }}\n
+
+    expect "Easy-RSA CA"
+    send {{ easyrsa_common_name }}\n
+
+    expect "whateverelse"
+  # why ^^ this final expect is needed I cannot explain, but it works.
+  args:
+    executable: /bin/expect
+    chdir: /etc/openvpn/easy-rsa
+    creates: pki/ca.crt
+  when: ansible_distribution == "CentOS"
+
+- name: ./easyrsa build-ca
+  shell: |
+    set timeout 60
+    spawn ./easyrsa build-ca
+
+    expect Passphrase:
+    send {{ easyrsa_ca_passphrase }}\n
+
+    expect Passphrase:
+    send {{ easyrsa_ca_passphrase }}\n
+
+    expect "Easy-RSA CA"
+    send {{ easyrsa_common_name }}\n
+
+    expect "whateverelse"
+  # why ^^ this final expect is needed I cannot explain, but it works.
+  args:
+    executable: /usr/bin/expect
+    chdir: /etc/openvpn/easy-rsa
+    creates: pki/ca.crt
+  when: ansible_distribution == "Ubuntu"
+
+- name: ./easyrsa gen-dh
+  command: ./easyrsa gen-dh
+  args:
+    chdir: /etc/openvpn/easy-rsa
+    creates: /etc/openvpn/easy-rsa/pki/dh.pem
+
+- name: ./easyrsa gen-req server nopass
+  shell: |
+    set timeout 60
+    spawn ./easyrsa gen-req server nopass
+
+    expect "server"
+    send {{ easyrsa_common_name }}\n
+
+    expect "whateverelse"
+  # why ^^ this final expect is needed I cannot explain, but it works.
+  args:
+    executable: /bin/expect
+    chdir: /etc/openvpn/easy-rsa
+    creates: pki/private/server.key
+  when: ansible_distribution == "CentOS"
+
+- name: ./easyrsa gen-req server nopass
+  shell: |
+    set timeout 60
+    spawn ./easyrsa gen-req server nopass
+
+    expect "server"
+    send {{ easyrsa_common_name }}\n
+
+    expect "whateverelse"
+  # why ^^ this final expect is needed I cannot explain, but it works.
+  args:
+    executable: /usr/bin/expect
+    chdir: /etc/openvpn/easy-rsa
+    creates: pki/private/server.key
+  when: ansible_distribution == "Ubuntu"
+
+- name: ./easyrsa sign-req server server
+  shell: |
+    set timeout 60
+    spawn ./easyrsa sign-req server server
+
+    expect "Confirm request details:"
+    send yes\n
+
+    expect "Enter pass phrase for /etc/openvpn/easy-rsa/pki/private/ca.key:"
+    send {{ easyrsa_ca_passphrase }}\n
+
+    expect "whateverelse"
+  # why ^^ this final expect is needed I cannot explain, but it works.
+  args:
+    executable: /bin/expect
+    chdir: /etc/openvpn/easy-rsa
+    creates: pki/issued/server.crt
+  when: ansible_distribution == "CentOS"
+
+- name: ./easyrsa sign-req server server
+  shell: |
+    set timeout 60
+    spawn ./easyrsa sign-req server server
+
+    expect "Confirm request details:"
+    send yes\n
+
+    expect "Enter pass phrase for /etc/openvpn/easy-rsa/pki/private/ca.key:"
+    send {{ easyrsa_ca_passphrase }}\n
+
+    expect "whateverelse"
+  # why ^^ this final expect is needed I cannot explain, but it works.
+  args:
+    executable: /usr/bin/expect
+    chdir: /etc/openvpn/easy-rsa
+    creates: pki/issued/server.crt
+  when: ansible_distribution == "Ubuntu"
+
+- name: openvpn --genkey --secret ta.key
+  command: openvpn --genkey --secret ta.key
+  args:
+    chdir: /etc/openvpn
+    creates: /etc/openvpn/ta.key
+
+- name: stash passphrase for future admins
+  shell: echo "{{ easyrsa_ca_passphrase }}" > ca-passphrase.txt
+  args:
+    chdir: /etc/openvpn
+    creates: /etc/openvpn/ca-passphrase.txt
+
+- name: place makecreds script (for user key generation)
+  copy:
+    src: ./templates/makecreds.sh
+    dest: /etc/openvpn/makecreds.sh
+
+- name: replace VPNNAME in makecreds script
+  replace:
+    path: /etc/openvpn/makecreds.sh
+    regexp: 'VPN_NAME'
+    replace: "{{ vpn_name }}"
+
+- name: make makecreds script executable
+  file:
+    path: /etc/openvpn/makecreds.sh
+    mode: '0700'

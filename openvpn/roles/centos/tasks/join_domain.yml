@@ -1,0 +1,58 @@
+---
+- name: Install ldap tools to join domain
+  yum:
+    name: "{{ packages }}"
+    state: present
+  vars:
+    packages:
+    - openldap
+    - openldap-clients
+    - nss-pam-ldapd
+    - pam_ldap 
+    - nscd
+    - autofs
+    - rpcbind
+    - nfs-utils
+
+- name: Join the domain (LDAP)
+  command: "authconfig --enableldap --enableldapauth --ldapserver={{ ldapserver }} --ldapbasedn={{ ldapbasedn }} --enablemkhomedir --update"
+
+- name: Place script for sshd to get SSH pub key from LDAP
+  copy:
+    src: files/ldap_ssh_pub_key.sh
+    dest: /etc/ssh/ldap_ssh_pub_key.sh
+    owner: root
+    group: root
+    mode: '0755'
+
+# Centos 7.7 default:
+#AuthorizedKeysCommand none
+#AuthorizedKeysCommandUser nobody
+
+- name: configure sshd to use the script
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: 'AuthorizedKeysCommand\ '
+    line: "AuthorizedKeysCommand /etc/ssh/ldap_ssh_pub_key.sh"
+    create: yes
+
+- name: configure sshd to run script as nobody
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: 'AuthorizedKeysCommandUser'
+    line: "AuthorizedKeysCommandUser nobody"
+    create: yes
+
+- name: restart sshd so changes take effect
+  service:
+    name: "sshd"
+    enabled: "yes"
+    state: "restarted"  
+
+- name: give members of group "wheel" sudo privilege
+  copy:
+    src: files/wheel
+    dest: /etc/sudoers.d/wheel
+    mode: '0440'
+    owner: root
+    group: root

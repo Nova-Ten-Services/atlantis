@@ -1,0 +1,6 @@
+---
+time_zone: America/Los_Angeles
+# locale: LANG=es_GT.utf8
+locale: LANG=en_US.utf8
+ldapserver: 10.96.32.10  # this is private IP of the services instance running ldap
+ldapbasedn: dc=nova-ten,dc=com

@@ -1,0 +1,30 @@
+---
+- name: Firewall rules - open https
+  firewalld:
+    service: https
+    permanent: yes
+    state: enabled
+  when: ansible_distribution == "CentOS"
+
+
+- name: Firewall rules - masquerade
+  firewalld:
+    masquerade: yes
+    permanent: yes
+    state: enabled
+  when: ansible_distribution == "CentOS"
+
+- name: Firewall reload
+  command: "firewall-cmd --reload"
+  when: ansible_distribution == "CentOS"
+
+- name: enable IP forwarding in /etc/sysctl.conf
+  lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^net.ipv4.ip_forward'
+    line: 'net.ipv4.ip_forward = 1'
+
+- name: enable IP forwarding now - without reboot
+  shell: echo 0 > /proc/sys/net/ipv4/ip_forward
+
+# NOTE: in Azure must also enable ip forwarding for network interface

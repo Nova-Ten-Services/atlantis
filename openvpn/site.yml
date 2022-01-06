@@ -1,0 +1,10 @@
+---
+- hosts: all
+  roles:
+  - centos
+  # - port_forward
+  - openvpn
+  vars_files:
+  - vars/centos.yml
+  - vars/openvpn.yml
+  become: yes

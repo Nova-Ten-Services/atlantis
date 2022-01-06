@@ -1,0 +1,7 @@
+---
+- include_tasks: configure.yml
+- include_tasks: install.yml
+- include_tasks: firewall.yml
+  when: ansible_distribution == "CentOS"
+
+# - include_tasks: join_domain.yml  # This works only if LDAP is up and working already

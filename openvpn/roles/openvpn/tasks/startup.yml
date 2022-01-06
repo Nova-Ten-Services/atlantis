@@ -1,0 +1,6 @@
+---
+- name: systemctl enable and start openvpn-server@{{ vpn_name }}
+  service:
+    name: "openvpn-server@{{ vpn_name }}"
+    enabled: "yes"
+    state: "started"

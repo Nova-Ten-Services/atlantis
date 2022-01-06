@@ -1,0 +1,17 @@
+---
+- name: Set hostname
+  command: "hostnamectl --static set-hostname {{ hostname }}"
+
+- name: Set timezone
+  timezone:
+    name: "{{ time_zone }}"
+
+- name: Set locale
+  command: "localectl set-locale {{ locale }}"
+
+- name: Config yum.conf
+  lineinfile:
+    path: /etc/yum.conf
+    regexp: 'metadata_expire='
+    line: metadata_expire=100000
+  when: ansible_distribution == "CentOS"

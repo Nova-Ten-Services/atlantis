@@ -1,0 +1,18 @@
+---
+# These values will be different for each openvpn server
+vpn_name: pqvpn01
+easyrsa_common_name: pqvpn01
+
+# easyrsa_ca_passphrase: sometrickypassphrasehere <-- moved to vault
+
+# openvpn_dhcp_subnet and mask are largely arbitrary but mustn't clash with other used public or private address spaces
+# small is ok, range must accomodate number of VPN users
+# e.g. 10.123.45.0 mask 255.255.255.0 (accomodates 250 users)
+openvpn_dhcp_subnet: 10.20.30.0
+openvpn_dhcp_mask: 255.255.255.0
+# vpc_subnet and vpc_mask are those where the openvpn server are located
+vpc_subnet: 10.0.0.0
+vpc_mask: 255.255.255.0
+# dns_1_ip should be the DNS used by machines where the openvpn server is located
+dns_1_ip: 8.8.8.8
+dns_2_ip: 8.8.4.4

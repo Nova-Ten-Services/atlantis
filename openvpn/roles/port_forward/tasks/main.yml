@@ -1,0 +1,17 @@
+---
+- name: Redirect port 2876 to services 22
+  command: firewall-cmd --add-forward-port=port=2876:proto=tcp:toport=22:toaddr=10.11.25.123 --permanent
+  when: ansible_distribution == "CentOS"
+
+
+# AWS security group must also allow 2876
+- name: Firewall rules open 2876 tcp to outside connections
+  firewalld:
+    port: 2876/tcp
+    permanent: yes
+    state: enabled
+  when: ansible_distribution == "CentOS"
+
+- name: Firewall reload
+  command: "firewall-cmd --reload"
+  when: ansible_distribution == "CentOS"

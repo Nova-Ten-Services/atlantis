@@ -1,0 +1,55 @@
+---
+- name: place openvpn config file - {{ vpn_name }}.conf
+  copy:
+    src: ./templates/openvpn.conf
+    dest: /etc/openvpn/server/{{ vpn_name }}.conf
+
+- name: replace OPENVPN_DHCP_SUBNET OPENVPN_DHCP_MASK in {{ vpn_name }}.conf
+  replace:
+    path: /etc/openvpn/server/{{ vpn_name }}.conf
+    regexp: 'OPENVPN_DHCP_SUBNET OPENVPN_DHCP_MASK'
+    replace: "{{ openvpn_dhcp_subnet }} {{ openvpn_dhcp_mask }}"
+
+- name: replace DNS_1_IP in {{ vpn_name }}.conf
+  replace:
+    path: /etc/openvpn/server/{{ vpn_name }}.conf
+    regexp: 'DNS_1_IP'
+    replace: "{{ dns_1_ip }}"
+
+- name: replace DNS_2_IP in {{ vpn_name }}.conf
+  replace:
+    path: /etc/openvpn/server/{{ vpn_name }}.conf
+    regexp: 'DNS_2_IP'
+    replace: "{{ dns_2_ip }}"
+
+- name: copy ca.crt to client folder for client key packaging
+  copy:
+    src: /etc/openvpn/easy-rsa/pki/ca.crt
+    dest: /etc/openvpn/client/ca.crt
+    remote_src: yes
+
+- name: copy ta.key to client folder for client key packaging
+  copy:
+    src: /etc/openvpn/ta.key
+    dest: /etc/openvpn/client/ta.key
+    remote_src: yes
+
+- name: place client openvpn config file - {{ vpn_name }}.ovpn
+  copy:
+    src: ./templates/openvpn.ovpn
+    dest: /etc/openvpn/client/{{ vpn_name }}.ovpn
+
+- name: replace VPC_SUBNET VPC_MASK in {{ vpn_name }}.ovpn
+  replace:
+    path: /etc/openvpn/client/{{ vpn_name }}.ovpn
+    regexp: 'VPC_SUBNET VPC_MASK'
+    replace: "{{ vpc_subnet }} {{ vpc_mask }}"
+
+- name: replace EASYRSA_COMMON_NAME in {{ vpn_name }}.ovpn
+  replace:
+    path: /etc/openvpn/client/{{ vpn_name }}.ovpn
+    regexp: 'EASYRSA_COMMON_NAME'
+    replace: "{{ easyrsa_common_name }}"
+
+# USERNAME in openvpn.ovpn is substituted my makecreds.sh on a per-user basis.
+
