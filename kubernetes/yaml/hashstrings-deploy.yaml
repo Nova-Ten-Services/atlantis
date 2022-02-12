@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hashstrings
+  labels:
+    app: hashstrings
+spec:
+  selector:
+    matchLabels:
+      app: hashstrings
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: hashstrings
+    spec:
+      containers:
+      - name: hashstrings
+        image: nova-ten/hashstrings-0.0.2-20220201d
+        imagePullPolicy: Never
+        ports:
+          - webapi
+          - containerPort: 8080
+        env:
+            - name: OBFUSCATIONLEVEL
+              value: '355'        
