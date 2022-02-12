@@ -1,0 +1,14 @@
+---
+apiVersion: "networking.k8s.io/v1"
+kind: "Ingress"
+metadata:
+  name: "hashstrings"
+  namespace: "default"
+spec:
+  defaultBackend:
+    service:
+      name: "hashstrings"
+      port:
+        number: 8080
+status:
+  loadBalancer: {}
