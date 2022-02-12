@@ -19,8 +19,8 @@ spec:
         image: nova-ten/hashstrings-0.0.2-20220201d
         imagePullPolicy: Never
         ports:
-          - webapi
-          - containerPort: 8080
+          - name: webapi
+            containerPort: 8080
         env:
             - name: OBFUSCATIONLEVEL
-              value: '355'        
+              value: '355'
