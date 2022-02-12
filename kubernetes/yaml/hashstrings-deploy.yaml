@@ -17,7 +17,7 @@ spec:
       containers:
       - name: hashstrings
         image: asia-southeast1-docker.pkg.dev/kaholo-charlie/kaholo-docker/hashstrings-0.0.2-20220201e
-        imagePullPolicy: Never
+        imagePullPolicy: IfNotPresent
         ports:
           - name: webapi
             containerPort: 8080
