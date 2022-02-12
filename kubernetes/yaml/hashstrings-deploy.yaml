@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: hashstrings
-        image: nova-ten/hashstrings-0.0.2-20220201d
+        image: asia-southeast1-docker.pkg.dev/kaholo-charlie/kaholo-docker/hashstrings-0.0.2-20220201e
         imagePullPolicy: Never
         ports:
           - name: webapi
