@@ -4,6 +4,7 @@ metadata:
   name: hashstrings
   labels:
     app: hashstrings
+  namespace: hashstrings
 spec:
   selector:
     matchLabels:

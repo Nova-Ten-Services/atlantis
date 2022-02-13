@@ -4,6 +4,7 @@ metadata:
   name: redis-server
   labels:
     app: redis-server
+  namespace: hashstrings
 spec:
   selector:
     matchLabels:
