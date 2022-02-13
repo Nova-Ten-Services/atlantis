@@ -4,7 +4,7 @@ metadata:
   name: hashstrings
   namespace: hashstrings
 spec:
-  type: NodePort
+  type: LoadBalancer
   selector:
     app: hashstrings
   ports:
